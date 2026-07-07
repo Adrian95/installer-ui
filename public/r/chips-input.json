@@ -1,0 +1,30 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "chips-input",
+	"type": "registry:component",
+	"title": "Chips Input",
+	"description": "A token / tag input with spring chip enter-exit, Enter/comma commit, Backspace-to-delete, and case-insensitive de-dupe.",
+	"dependencies": [
+		"@phosphor-icons/react",
+		"motion",
+		"clsx",
+		"tailwind-merge"
+	],
+	"registryDependencies": [
+		"https://installer-ui.vercel.app/r/theme.json"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/chips-input.tsx",
+			"content": "import { X } from \"@phosphor-icons/react\";\nimport { AnimatePresence, motion, useReducedMotion } from \"motion/react\";\nimport { useId, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// A token/tag input: free text becomes removable chips. Enter or comma\n// commits the current text; Backspace on an empty field removes the last\n// chip; each chip has its own remove button. De-dupes case-insensitively so\n// \"SaaS\" and \"saas\" don't both land.\n\nconst CHIP_SPRING = {\n\ttype: \"spring\",\n\tstiffness: 520,\n\tdamping: 34,\n\tmass: 0.5,\n} as const;\n\nexport function Chip({\n\tlabel,\n\tonRemove,\n\tdisabled,\n\tanimate = true,\n}: {\n\tlabel: string;\n\tonRemove?: () => void;\n\tdisabled?: boolean;\n\tanimate?: boolean;\n}) {\n\tconst reduceMotion = useReducedMotion();\n\tconst motionProps =\n\t\tanimate && !reduceMotion\n\t\t\t? {\n\t\t\t\t\tlayout: true,\n\t\t\t\t\tinitial: { opacity: 0, scale: 0.85 },\n\t\t\t\t\tanimate: { opacity: 1, scale: 1 },\n\t\t\t\t\texit: { opacity: 0, scale: 0.85 },\n\t\t\t\t\ttransition: CHIP_SPRING,\n\t\t\t\t}\n\t\t\t: {};\n\n\treturn (\n\t\t<motion.span\n\t\t\t{...motionProps}\n\t\t\tclassName=\"inline-flex max-w-full items-center gap-1 rounded-[6px] border border-border/70 bg-card py-0.5 pl-2 pr-1 text-[12px] font-medium text-foreground\"\n\t\t>\n\t\t\t<span className=\"truncate\">{label}</span>\n\t\t\t{onRemove ? (\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\taria-label={`Remove ${label}`}\n\t\t\t\t\tonClick={onRemove}\n\t\t\t\t\tdisabled={disabled}\n\t\t\t\t\tclassName=\"inline-flex size-4 shrink-0 items-center justify-center rounded-[4px] text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary disabled:pointer-events-none disabled:opacity-40\"\n\t\t\t\t>\n\t\t\t\t\t<X weight=\"bold\" className=\"size-2.5\" />\n\t\t\t\t</button>\n\t\t\t) : null}\n\t\t</motion.span>\n\t);\n}\n\nexport function ChipsInput({\n\tvalue,\n\tonChange,\n\tplaceholder,\n\tdisabled = false,\n\tid,\n\t\"aria-label\": ariaLabel,\n}: {\n\tvalue: readonly string[];\n\tonChange: (next: string[]) => void;\n\tplaceholder?: string;\n\tdisabled?: boolean;\n\tid?: string;\n\t\"aria-label\"?: string;\n}) {\n\tconst generatedId = useId();\n\tconst inputId = id ?? generatedId;\n\tconst [text, setText] = useState(\"\");\n\n\tfunction addToken(raw: string) {\n\t\tconst token = raw.trim();\n\t\tif (token.length === 0) return;\n\t\tconst exists = value.some(\n\t\t\t(entry) => entry.toLowerCase() === token.toLowerCase(),\n\t\t);\n\t\tif (!exists) onChange([...value, token]);\n\t\tsetText(\"\");\n\t}\n\n\tfunction removeAt(index: number) {\n\t\tonChange(value.filter((_, i) => i !== index));\n\t}\n\n\tfunction handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {\n\t\tif (event.key === \"Enter\" || event.key === \",\") {\n\t\t\tevent.preventDefault();\n\t\t\taddToken(text);\n\t\t} else if (event.key === \"Backspace\" && text.length === 0 && value.length) {\n\t\t\tevent.preventDefault();\n\t\t\tremoveAt(value.length - 1);\n\t\t}\n\t}\n\n\treturn (\n\t\t// The input is `flex-1`, so it already fills the empty area to the right\n\t\t// of the chips — clicking the field lands on the real control. The\n\t\t// labeled control is the input itself; chip buttons carry their own\n\t\t// labels.\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"flex w-full cursor-text flex-wrap items-center gap-1.5 rounded-[8px] border border-border bg-secondary px-2 py-1.5 text-left transition-[border-color,box-shadow] duration-150\",\n\t\t\t\t\"focus-within:border-primary focus-within:[box-shadow:0_0_0_3px_color-mix(in_srgb,var(--primary)_12%,transparent)]\",\n\t\t\t\tdisabled && \"pointer-events-none opacity-50\",\n\t\t\t)}\n\t\t>\n\t\t\t<AnimatePresence initial={false}>\n\t\t\t\t{value.map((chip, index) => (\n\t\t\t\t\t<Chip\n\t\t\t\t\t\tkey={chip}\n\t\t\t\t\t\tlabel={chip}\n\t\t\t\t\t\tdisabled={disabled}\n\t\t\t\t\t\tonRemove={() => removeAt(index)}\n\t\t\t\t\t/>\n\t\t\t\t))}\n\t\t\t</AnimatePresence>\n\t\t\t<input\n\t\t\t\tid={inputId}\n\t\t\t\tvalue={text}\n\t\t\t\tdisabled={disabled}\n\t\t\t\taria-label={ariaLabel}\n\t\t\t\tonChange={(event) => setText(event.target.value)}\n\t\t\t\tonKeyDown={handleKeyDown}\n\t\t\t\tonBlur={() => addToken(text)}\n\t\t\t\tplaceholder={value.length === 0 ? placeholder : undefined}\n\t\t\t\tclassName=\"font-ui h-6 min-w-[8ch] flex-1 bg-transparent px-1 text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground\"\n\t\t\t/>\n\t\t</div>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/chips-input.tsx"
+		},
+		{
+			"path": "src/lib/utils.ts",
+			"content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"type": "registry:lib",
+			"target": "lib/utils.ts"
+		}
+	]
+}

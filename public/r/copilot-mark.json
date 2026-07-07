@@ -3,10 +3,13 @@
 	"name": "copilot-mark",
 	"type": "registry:component",
 	"title": "Copilot Mark",
-	"description": "The Installer logomark as a presence indicator: quiet in the text color when idle, a brand-gradient line perpetually tracing its own glyph while live.",
+	"description": "The logomark as a presence indicator — quiet in the text color when idle, a brand-gradient line tracing its own glyph while live.",
 	"dependencies": [
 		"clsx",
 		"tailwind-merge"
+	],
+	"registryDependencies": [
+		"https://installer-ui.vercel.app/r/theme.json"
 	],
 	"files": [
 		{
@@ -23,7 +26,7 @@
 		},
 		{
 			"path": "src/lib/utils.ts",
-			"content": "import { clsx, type ClassValue } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
 			"type": "registry:lib",
 			"target": "lib/utils.ts"
 		}

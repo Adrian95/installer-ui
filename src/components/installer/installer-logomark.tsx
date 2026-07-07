@@ -38,6 +38,7 @@ export function InstallerLogomark({
 	const pathClass = `installer-logomark-path-${uid}`;
 	const fillDelayMs = Math.round(drawDurationMs * 0.77);
 	return (
+		// biome-ignore lint/a11y/noSvgWithoutTitle: labelled conditionally — role="img" + <title> when `title` is set, aria-hidden otherwise; the static rule can't see through the spread.
 		<svg
 			viewBox={INSTALLER_LOGO_VIEWBOX}
 			className={className}

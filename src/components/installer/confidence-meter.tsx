@@ -17,6 +17,7 @@ import { cn } from "#/lib/utils";
 // Buckets: very_low / low / moderate / high / very_high.
 
 const SEGMENTS = 5;
+const SEGMENT_KEYS = Array.from({ length: SEGMENTS }, (_, i) => `seg-${i}`);
 
 type ConfidenceTone = "muted" | "amber" | "primary";
 
@@ -73,12 +74,13 @@ export function ConfidenceMeter({
 					"inline-flex items-center gap-1.5 type-meta text-muted-foreground/70",
 					className,
 				)}
+				role="img"
 				aria-label="Confidence not provided"
 			>
 				<span className="inline-flex gap-[2px]" aria-hidden>
-					{Array.from({ length: SEGMENTS }).map((_, i) => (
+					{SEGMENT_KEYS.map((key) => (
 						<span
-							key={i}
+							key={key}
 							className="h-2 w-1.5 rounded-[1px] bg-muted-foreground/15"
 						/>
 					))}
@@ -107,11 +109,11 @@ export function ConfidenceMeter({
 						aria-label={`Confidence ${percent} percent — ${label}`}
 					>
 						<span className="inline-flex gap-[2px]" aria-hidden>
-							{Array.from({ length: SEGMENTS }).map((_, i) => {
+							{SEGMENT_KEYS.map((key, i) => {
 								const isFilled = i < filled;
 								return (
 									<motion.span
-										key={i}
+										key={key}
 										initial={{ scaleY: isFilled ? 0.4 : 1, opacity: 0.5 }}
 										animate={{ scaleY: 1, opacity: 1 }}
 										transition={{

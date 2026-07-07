@@ -3,7 +3,7 @@
 	"name": "installer-loading",
 	"type": "registry:component",
 	"title": "Installer Loading",
-	"description": "Full-page indefinite wait state: a gradient comet endlessly traces the logomark while the fill breathes. Pure CSS, self-contained (no Tailwind required).",
+	"description": "Full-page indefinite wait state — a gradient comet endlessly traces the logomark while the fill breathes. Pure CSS, self-contained.",
 	"files": [
 		{
 			"path": "src/components/installer/installer-loading.tsx",

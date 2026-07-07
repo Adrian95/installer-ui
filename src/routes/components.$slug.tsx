@@ -1,21 +1,25 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { ComponentPage } from "#/components/showcase/component-page";
-import { DEMOS, type DemoEntry } from "#/components/showcase/demos";
+import { DEMOS } from "#/components/showcase/demos";
 import type { RegistrySlug } from "#/components/showcase/registry";
 
 export const Route = createFileRoute("/components/$slug")({
+	// Only the slug crosses the loader boundary — it must stay
+	// JSON-serializable for client hydration. The demo entry (which
+	// holds React elements) is looked up in the component, never
+	// returned from the loader.
 	loader: ({ params }) => {
-		const entry = DEMOS[params.slug as RegistrySlug] as DemoEntry | undefined;
-		if (!entry) throw notFound();
-		return { slug: params.slug as RegistrySlug, entry };
+		if (!(params.slug in DEMOS)) throw notFound();
+		return { slug: params.slug as RegistrySlug };
 	},
 	component: ComponentRoute,
 	notFoundComponent: NotFound,
 });
 
 function ComponentRoute() {
-	const { slug, entry } = Route.useLoaderData();
+	const { slug } = Route.useLoaderData();
+	const entry = DEMOS[slug];
 	return (
 		<ComponentPage
 			slug={slug}

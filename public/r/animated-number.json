@@ -3,7 +3,7 @@
 	"name": "animated-number",
 	"type": "registry:component",
 	"title": "Animated Number",
-	"description": "Tasteful numeric ease for figures that change — rAF-driven easeOutQuad with an injected formatter; snaps under prefers-reduced-motion.",
+	"description": "Tasteful numeric ease for figures that change — bring your own formatter; snaps under prefers-reduced-motion.",
 	"dependencies": [
 		"motion"
 	],

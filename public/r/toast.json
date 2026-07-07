@@ -1,0 +1,21 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "toast",
+	"type": "registry:component",
+	"title": "Toast",
+	"description": "A theme-syncing sonner Toaster plus the toast() function, styled to the Installer surfaces (bottom-right, rich colors, close button).",
+	"dependencies": [
+		"sonner"
+	],
+	"registryDependencies": [
+		"https://installer-ui.vercel.app/r/theme.json"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/toast.tsx",
+			"content": "import { useEffect, useState } from \"react\";\nimport { Toaster as SonnerToaster } from \"sonner\";\n\n// Re-export sonner's imperative `toast()` function so consumers can do\n// `import { Toaster, toast } from \"@/components/installer/toast\"` and never\n// touch the `sonner` package directly.\nexport { toast } from \"sonner\";\n\nfunction getResolvedTheme() {\n\tif (typeof document === \"undefined\") {\n\t\treturn \"light\" as const;\n\t}\n\n\treturn document.documentElement.classList.contains(\"dark\") ? \"dark\" : \"light\";\n}\n\n/**\n * Toaster\n *\n * A themed wrapper around sonner's `<Toaster />`. Syncs to the `dark` class\n * on `<html>` via a MutationObserver (so it follows the same theme switch\n * as the rest of the app, including toggles that happen outside React),\n * plus the OS `prefers-color-scheme` and cross-tab `storage` changes.\n *\n * Mount once near the root of the app:\n *\n *   <Toaster />\n *\n * then anywhere:\n *\n *   import { toast } from \"@/components/installer/toast\";\n *   toast.success(\"Saved\");\n */\nexport function Toaster() {\n\tconst [theme, setTheme] = useState<\"light\" | \"dark\">(getResolvedTheme);\n\n\tuseEffect(() => {\n\t\tconst syncTheme = () => setTheme(getResolvedTheme());\n\t\tconst mediaQuery = window.matchMedia(\"(prefers-color-scheme: dark)\");\n\t\tconst observer = new MutationObserver(syncTheme);\n\n\t\tsyncTheme();\n\t\tobserver.observe(document.documentElement, {\n\t\t\tattributeFilter: [\"class\", \"data-theme\"],\n\t\t\tattributes: true,\n\t\t});\n\t\tmediaQuery.addEventListener(\"change\", syncTheme);\n\t\twindow.addEventListener(\"storage\", syncTheme);\n\n\t\treturn () => {\n\t\t\tobserver.disconnect();\n\t\t\tmediaQuery.removeEventListener(\"change\", syncTheme);\n\t\t\twindow.removeEventListener(\"storage\", syncTheme);\n\t\t};\n\t}, []);\n\n\treturn (\n\t\t<SonnerToaster\n\t\t\tcloseButton\n\t\t\tcontainerAriaLabel=\"Notifications\"\n\t\t\tduration={4000}\n\t\t\texpand={false}\n\t\t\tgap={12}\n\t\t\toffset={20}\n\t\t\tposition=\"bottom-right\"\n\t\t\trichColors\n\t\t\ttheme={theme}\n\t\t\ttoastOptions={{\n\t\t\t\tclassNames: {\n\t\t\t\t\tdescription: \"text-muted-foreground\",\n\t\t\t\t\ttoast: \"border border-border bg-card text-card-foreground shadow-lg\",\n\t\t\t\t},\n\t\t\t\tduration: 4000,\n\t\t\t}}\n\t\t\tvisibleToasts={4}\n\t\t/>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/toast.tsx"
+		}
+	]
+}

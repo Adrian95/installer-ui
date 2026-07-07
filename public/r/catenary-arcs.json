@@ -3,10 +3,13 @@
 	"name": "catenary-arcs",
 	"type": "registry:component",
 	"title": "Catenary Arcs",
-	"description": "Four nested catenary arches drawing themselves on, outermost first — hairline strokes with the brand gradient on the innermost arch. Pure CSS.",
+	"description": "Four nested catenary arches drawing themselves on, outermost first, the innermost in the brand gradient. Pure CSS.",
 	"dependencies": [
 		"clsx",
 		"tailwind-merge"
+	],
+	"registryDependencies": [
+		"https://installer-ui.vercel.app/r/theme.json"
 	],
 	"files": [
 		{
@@ -17,7 +20,7 @@
 		},
 		{
 			"path": "src/lib/utils.ts",
-			"content": "import { clsx, type ClassValue } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
 			"type": "registry:lib",
 			"target": "lib/utils.ts"
 		}

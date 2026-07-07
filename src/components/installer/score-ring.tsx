@@ -1,40 +1,36 @@
+/**
+ * ScoreRing — a circular 0–100 indicator that spring-fills on mount.
+ *
+ * Four sizes (xs 20px → lg 80px) and four states driving the stroke:
+ *   unknown → slate, dashed track, number suppressed (shows "—")
+ *   low     → red
+ *   medium  → amber
+ *   high    → brand green
+ *
+ * When `state="unknown"` the ring stays empty and hides the number so
+ * it never reads as a real zero.
+ */
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef } from "react";
 
 import { cn } from "#/lib/utils";
 
-// ─── SpicedRing ────────────────────────────────────────
-//
-// Circular 0–100 score indicator. Sizes:
-//   xs   — 18px outer, for kanban cards
-//   sm   — 22px outer, for data table cells
-//   md   — 48px outer, for hero blocks
-//   lg   — 80px outer, for full-screen flows
-//
-// `state` drives the stroke colour:
-//   unknown    → slate  (haven't measured yet)
-//   weak       → red    (<40)
-//   developing → amber  (40–74)
-//   strong     → emerald brand (≥75)
-//
-// When `state === "unknown"` we render a dashed ring and
-// suppress the percentage so the UI doesn't mislead the
-// viewer into thinking the score is zero.
+export type ScoreRingSize = "xs" | "sm" | "md" | "lg";
+export type ScoreRingState = "unknown" | "low" | "medium" | "high";
 
-export type SpicedRingSize = "xs" | "sm" | "md" | "lg";
-export type SpicedRingState = "unknown" | "weak" | "developing" | "strong";
-
-export interface SpicedRingProps {
+export interface ScoreRingProps {
+	/** 0–100. Clamped and rounded for display. */
 	score: number;
-	state: SpicedRingState;
-	size?: SpicedRingSize;
+	state: ScoreRingState;
+	size?: ScoreRingSize;
 	showLabel?: boolean;
 	className?: string;
+	/** Overrides the computed aria-label. */
 	label?: string;
 }
 
 const SIZE_CONFIG: Record<
-	SpicedRingSize,
+	ScoreRingSize,
 	{ outer: number; r: number; stroke: number; text: string }
 > = {
 	xs: { outer: 20, r: 8, stroke: 2.5, text: "text-[9px] font-semibold" },
@@ -43,28 +39,28 @@ const SIZE_CONFIG: Record<
 	lg: { outer: 80, r: 35, stroke: 6, text: "text-xl font-bold" },
 };
 
-const STATE_COLOR: Record<SpicedRingState, string> = {
+const STATE_COLOR: Record<ScoreRingState, string> = {
 	unknown: "text-slate-400",
-	weak: "text-red-500",
-	developing: "text-amber-500",
-	strong: "text-[var(--color-brand)]",
+	low: "text-red-500",
+	medium: "text-amber-500",
+	high: "text-[var(--color-brand)]",
 };
 
-const STATE_TRACK: Record<SpicedRingState, string> = {
+const STATE_TRACK: Record<ScoreRingState, string> = {
 	unknown: "text-slate-200 dark:text-slate-800",
-	weak: "text-red-500/15",
-	developing: "text-amber-500/15",
-	strong: "text-[var(--color-brand)]/15",
+	low: "text-red-500/15",
+	medium: "text-amber-500/15",
+	high: "text-[var(--color-brand)]/15",
 };
 
-export function SpicedRing({
+export function ScoreRing({
 	score,
 	state,
 	size = "sm",
 	showLabel = true,
 	className,
 	label,
-}: SpicedRingProps) {
+}: ScoreRingProps) {
 	const config = SIZE_CONFIG[size];
 	const circumference = 2 * Math.PI * config.r;
 	const center = config.outer / 2;
