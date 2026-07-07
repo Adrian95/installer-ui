@@ -1,0 +1,42 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "spiced-ring",
+	"type": "registry:component",
+	"title": "SPICED Ring",
+	"description": "Circular 0-100 score indicator in four sizes with spring-animated progress; state drives the stroke color and an unknown state renders a dashed ring.",
+	"dependencies": [
+		"motion",
+		"clsx",
+		"tailwind-merge"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/spiced-ring.tsx",
+			"content": "import { motion, useMotionValue, useSpring, useTransform } from \"motion/react\";\nimport { useEffect, useRef } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// ─── SpicedRing ────────────────────────────────────────\n//\n// Circular 0–100 score indicator. Sizes:\n//   xs   — 18px outer, for kanban cards\n//   sm   — 22px outer, for data table cells\n//   md   — 48px outer, for hero blocks\n//   lg   — 80px outer, for full-screen flows\n//\n// `state` drives the stroke colour:\n//   unknown    → slate  (haven't measured yet)\n//   weak       → red    (<40)\n//   developing → amber  (40–74)\n//   strong     → emerald brand (≥75)\n//\n// When `state === \"unknown\"` we render a dashed ring and\n// suppress the percentage so the UI doesn't mislead the\n// viewer into thinking the score is zero.\n\nexport type SpicedRingSize = \"xs\" | \"sm\" | \"md\" | \"lg\";\nexport type SpicedRingState = \"unknown\" | \"weak\" | \"developing\" | \"strong\";\n\nexport interface SpicedRingProps {\n\tscore: number;\n\tstate: SpicedRingState;\n\tsize?: SpicedRingSize;\n\tshowLabel?: boolean;\n\tclassName?: string;\n\tlabel?: string;\n}\n\nconst SIZE_CONFIG: Record<\n\tSpicedRingSize,\n\t{ outer: number; r: number; stroke: number; text: string }\n> = {\n\txs: { outer: 20, r: 8, stroke: 2.5, text: \"text-[9px] font-semibold\" },\n\tsm: { outer: 24, r: 10, stroke: 2.5, text: \"text-[10px] font-semibold\" },\n\tmd: { outer: 48, r: 21, stroke: 4, text: \"text-sm font-semibold\" },\n\tlg: { outer: 80, r: 35, stroke: 6, text: \"text-xl font-bold\" },\n};\n\nconst STATE_COLOR: Record<SpicedRingState, string> = {\n\tunknown: \"text-slate-400\",\n\tweak: \"text-red-500\",\n\tdeveloping: \"text-amber-500\",\n\tstrong: \"text-[var(--color-brand)]\",\n};\n\nconst STATE_TRACK: Record<SpicedRingState, string> = {\n\tunknown: \"text-slate-200 dark:text-slate-800\",\n\tweak: \"text-red-500/15\",\n\tdeveloping: \"text-amber-500/15\",\n\tstrong: \"text-[var(--color-brand)]/15\",\n};\n\nexport function SpicedRing({\n\tscore,\n\tstate,\n\tsize = \"sm\",\n\tshowLabel = true,\n\tclassName,\n\tlabel,\n}: SpicedRingProps) {\n\tconst config = SIZE_CONFIG[size];\n\tconst circumference = 2 * Math.PI * config.r;\n\tconst center = config.outer / 2;\n\tconst isUnknown = state === \"unknown\";\n\tconst displayScore = Math.max(0, Math.min(100, Math.round(score)));\n\n\tconst progress = useMotionValue(0);\n\tconst spring = useSpring(progress, { stiffness: 110, damping: 22 });\n\tconst strokeDashoffset = useTransform(\n\t\tspring,\n\t\t(v) => circumference - (v / 100) * circumference,\n\t);\n\n\tconst hasAnimated = useRef(false);\n\tuseEffect(() => {\n\t\tif (!hasAnimated.current) {\n\t\t\tprogress.set(0);\n\t\t\trequestAnimationFrame(() => progress.set(isUnknown ? 0 : displayScore));\n\t\t\thasAnimated.current = true;\n\t\t} else {\n\t\t\tprogress.set(isUnknown ? 0 : displayScore);\n\t\t}\n\t}, [displayScore, isUnknown, progress]);\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative inline-flex items-center justify-center\",\n\t\t\t\tclassName,\n\t\t\t)}\n\t\t\tstyle={{ width: config.outer, height: config.outer }}\n\t\t\trole=\"img\"\n\t\t\taria-label={\n\t\t\t\tlabel ??\n\t\t\t\t(isUnknown ? \"Score not yet assessed\" : `Score ${displayScore} of 100`)\n\t\t\t}\n\t\t>\n\t\t\t<svg\n\t\t\t\twidth={config.outer}\n\t\t\t\theight={config.outer}\n\t\t\t\tclassName=\"-rotate-90\"\n\t\t\t\taria-hidden=\"true\"\n\t\t\t>\n\t\t\t\t<circle\n\t\t\t\t\tcx={center}\n\t\t\t\t\tcy={center}\n\t\t\t\t\tr={config.r}\n\t\t\t\t\tfill=\"none\"\n\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\tstrokeWidth={config.stroke}\n\t\t\t\t\tstrokeDasharray={isUnknown ? \"2 3\" : undefined}\n\t\t\t\t\tclassName={STATE_TRACK[state]}\n\t\t\t\t/>\n\t\t\t\t{!isUnknown && (\n\t\t\t\t\t<motion.circle\n\t\t\t\t\t\tcx={center}\n\t\t\t\t\t\tcy={center}\n\t\t\t\t\t\tr={config.r}\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\tstrokeWidth={config.stroke}\n\t\t\t\t\t\tstrokeDasharray={circumference}\n\t\t\t\t\t\tstyle={{ strokeDashoffset }}\n\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\tclassName={STATE_COLOR[state]}\n\t\t\t\t\t/>\n\t\t\t\t)}\n\t\t\t</svg>\n\t\t\t{showLabel && (\n\t\t\t\t<span\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"absolute leading-none\",\n\t\t\t\t\t\tconfig.text,\n\t\t\t\t\t\tisUnknown ? \"text-slate-400\" : STATE_COLOR[state],\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t{isUnknown ? \"—\" : displayScore}\n\t\t\t\t</span>\n\t\t\t)}\n\t\t</div>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/spiced-ring.tsx"
+		},
+		{
+			"path": "src/lib/utils.ts",
+			"content": "import { clsx, type ClassValue } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"type": "registry:lib",
+			"target": "lib/utils.ts"
+		}
+	],
+	"cssVars": {
+		"theme": {
+			"color-brand": "#00CC33",
+			"color-brand-light": "#7AFF04"
+		},
+		"light": {
+			"border": "#E0E0E0",
+			"muted-foreground": "#8A8A8A",
+			"destructive": "#dc2626"
+		},
+		"dark": {
+			"border": "#2A2A2A",
+			"muted-foreground": "#888888",
+			"destructive": "#dc2626"
+		}
+	}
+}

@@ -1,0 +1,67 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry.json",
+	"name": "installer-ui",
+	"homepage": "https://installer-ui.vercel.app",
+	"items": [
+		{
+			"name": "installer-logomark",
+			"type": "registry:component",
+			"title": "Installer Logomark",
+			"description": "Animated Installer logomark — a one-shot draw-on + gradient-bloom for arrival moments. Pure CSS, zero dependencies beyond React."
+		},
+		{
+			"name": "installer-loading",
+			"type": "registry:component",
+			"title": "Installer Loading",
+			"description": "Full-page indefinite wait state: a gradient comet endlessly traces the logomark while the fill breathes. Pure CSS, self-contained (no Tailwind required)."
+		},
+		{
+			"name": "hero-scene",
+			"type": "registry:component",
+			"title": "Hero Scene",
+			"description": "The \"network behind the mark\" landing hero: a monumental ghost logomark over an animated dispatch constellation, with staggered copy, chips, and a marquee ticker."
+		},
+		{
+			"name": "catenary-arcs",
+			"type": "registry:component",
+			"title": "Catenary Arcs",
+			"description": "Four nested catenary arches drawing themselves on, outermost first — hairline strokes with the brand gradient on the innermost arch. Pure CSS."
+		},
+		{
+			"name": "copilot-mark",
+			"type": "registry:component",
+			"title": "Copilot Mark",
+			"description": "The Installer logomark as a presence indicator: quiet in the text color when idle, a brand-gradient line perpetually tracing its own glyph while live."
+		},
+		{
+			"name": "spiced-band",
+			"type": "registry:component",
+			"title": "SPICED Band",
+			"description": "Five discrete cell meters, one per SPICED pillar, on a 0-3 scale — reads like a battery, with gate-capped ghosts, a red weak alarm, and an assessing sweep."
+		},
+		{
+			"name": "spiced-ring",
+			"type": "registry:component",
+			"title": "SPICED Ring",
+			"description": "Circular 0-100 score indicator in four sizes with spring-animated progress; state drives the stroke color and an unknown state renders a dashed ring."
+		},
+		{
+			"name": "confidence-meter",
+			"type": "registry:component",
+			"title": "Confidence Meter",
+			"description": "Calibrated 0-1 confidence as a dense 5-segment meter with tone-coded label and tooltip — fits in a row next to a chip without stealing the eye."
+		},
+		{
+			"name": "animated-number",
+			"type": "registry:component",
+			"title": "Animated Number",
+			"description": "Tasteful numeric ease for figures that change — rAF-driven easeOutQuad with an injected formatter; snaps under prefers-reduced-motion."
+		},
+		{
+			"name": "illustrations",
+			"type": "registry:component",
+			"title": "Illustrations",
+			"description": "Six animated SVG scene illustrations (Archer, Ascent, Catalyst, Funnel, Hourglass, Topography) with bloom filters and brand-token accents, plus a barrel export."
+		}
+	]
+}

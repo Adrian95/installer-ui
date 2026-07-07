@@ -1,0 +1,25 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "catenary-arcs",
+	"type": "registry:component",
+	"title": "Catenary Arcs",
+	"description": "Four nested catenary arches drawing themselves on, outermost first — hairline strokes with the brand gradient on the innermost arch. Pure CSS.",
+	"dependencies": [
+		"clsx",
+		"tailwind-merge"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/catenary-arcs.tsx",
+			"content": "import { useId } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// ──────────────────────────────────────────────────────────────\n//  CatenaryArcs — nested catenary arches, hairline-drawn.\n//\n//  Gaudí found the catenary by hanging chains and inverting them;\n//  here four nested arches draw themselves on, outermost first,\n//  like a nave receding into light. Everything is hairline\n//  stroke — the only color is the innermost arch, which carries\n//  the brand gradient. Pure CSS (stroke-dasharray draw), static\n//  under prefers-reduced-motion.\n// ──────────────────────────────────────────────────────────────\n\nconst CX = 120;\nconst FOOT_Y = 118;\n\ntype Arch = {\n\t/** Half-width at the feet. */\n\tw: number;\n\t/** Apex height (smaller = taller). */\n\tay: number;\n\topacity: number;\n\tdelayMs: number;\n\tgradient?: boolean;\n};\n\nconst ARCHES: Arch[] = [\n\t{ w: 98, ay: 10, opacity: 0.1, delayMs: 0 },\n\t{ w: 76, ay: 34, opacity: 0.16, delayMs: 140 },\n\t{ w: 55, ay: 57, opacity: 0.24, delayMs: 280 },\n\t{ w: 35, ay: 79, opacity: 0.9, delayMs: 420, gradient: true },\n];\n\n/** Cubic approximation of a catenary arch: steep at the legs, flat at\n *  the crown. Drawn foot → apex → foot so the dash animation raises the\n *  arch from both sides at once. */\nfunction archPath({ w, ay }: Pick<Arch, \"w\" | \"ay\">) {\n\tconst h = FOOT_Y - ay;\n\tconst shoulderY = FOOT_Y - 0.62 * h;\n\tconst crownX = 0.58 * w;\n\treturn [\n\t\t`M ${CX - w} ${FOOT_Y}`,\n\t\t`C ${CX - w} ${shoulderY}, ${CX - crownX} ${ay}, ${CX} ${ay}`,\n\t\t`C ${CX + crownX} ${ay}, ${CX + w} ${shoulderY}, ${CX + w} ${FOOT_Y}`,\n\t].join(\" \");\n}\n\nexport function CatenaryArcs({\n\tclassName,\n\tdrawDurationMs = 1200,\n}: {\n\tclassName?: string;\n\tdrawDurationMs?: number;\n}) {\n\tconst rawId = useId();\n\tconst uid = rawId.replace(/[^a-zA-Z0-9-]/g, \"\");\n\tconst gradientId = `catenary-gradient-${uid}`;\n\tconst pathClass = `catenary-path-${uid}`;\n\n\treturn (\n\t\t<svg\n\t\t\taria-hidden=\"true\"\n\t\t\tviewBox=\"0 0 240 120\"\n\t\t\tfill=\"none\"\n\t\t\tclassName={cn(\"overflow-visible\", className)}\n\t\t>\n\t\t\t<style>{`\n\t\t\t\t.${pathClass} {\n\t\t\t\t\tstroke-dasharray: 1;\n\t\t\t\t\tstroke-dashoffset: 1;\n\t\t\t\t\tanimation: catenary-draw-${uid} ${drawDurationMs}ms cubic-bezier(0.65, 0, 0.35, 1) forwards;\n\t\t\t\t}\n\t\t\t\t@keyframes catenary-draw-${uid} {\n\t\t\t\t\tto { stroke-dashoffset: 0; }\n\t\t\t\t}\n\t\t\t\t@media (prefers-reduced-motion: reduce) {\n\t\t\t\t\t.${pathClass} {\n\t\t\t\t\t\tanimation: none;\n\t\t\t\t\t\tstroke-dashoffset: 0;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t`}</style>\n\t\t\t<defs>\n\t\t\t\t<linearGradient id={gradientId} x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n\t\t\t\t\t<stop offset=\"0\" stopColor=\"#7AFF04\" />\n\t\t\t\t\t<stop offset=\"1\" stopColor=\"#00CC33\" />\n\t\t\t\t</linearGradient>\n\t\t\t</defs>\n\t\t\t{ARCHES.map((arch) => (\n\t\t\t\t<path\n\t\t\t\t\tkey={arch.w}\n\t\t\t\t\td={archPath(arch)}\n\t\t\t\t\tpathLength={1}\n\t\t\t\t\tclassName={pathClass}\n\t\t\t\t\tstroke={arch.gradient ? `url(#${gradientId})` : \"currentColor\"}\n\t\t\t\t\tstrokeWidth={1}\n\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\tvectorEffect=\"non-scaling-stroke\"\n\t\t\t\t\topacity={arch.opacity}\n\t\t\t\t\tstyle={{ animationDelay: `${arch.delayMs}ms` }}\n\t\t\t\t/>\n\t\t\t))}\n\t\t</svg>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/catenary-arcs.tsx"
+		},
+		{
+			"path": "src/lib/utils.ts",
+			"content": "import { clsx, type ClassValue } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"type": "registry:lib",
+			"target": "lib/utils.ts"
+		}
+	]
+}
