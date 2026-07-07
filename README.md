@@ -1,83 +1,105 @@
 # Installer UI
 
-Animated brand components, score meters, and hero scenes from Installer's internal tools — install them via the shadcn registry or copy-paste the source.
+A small set of delightful, self-contained React components — inputs and controls on [Base UI](https://base-ui.com), plus animated brand marks and data meters — lifted from Installer's internal tools. Install them through the shadcn registry or copy the source.
 
 Live showcase: **[installer-ui.vercel.app](https://installer-ui.vercel.app)**
 
 ## Quick start
 
-### Option A: shadcn registry
+Install any component with the shadcn CLI. Each component that uses design tokens also pulls the **theme** item automatically, so the CSS variables land in your `globals.css` on first install — no extra step.
 
 ```bash
-npx shadcn@latest add https://installer-ui.vercel.app/r/installer-loading.json
+npx shadcn@latest add https://installer-ui.vercel.app/r/select.json
 ```
+
+Or install the theme on its own first (recommended if you want the whole system up front):
+
+```bash
+npx shadcn@latest add https://installer-ui.vercel.app/r/theme.json
+```
+
+### Components
 
 | Item | Description |
 | --- | --- |
-| [`installer-logomark`](https://installer-ui.vercel.app/r/installer-logomark.json) | One-shot draw-on + gradient-bloom logomark for arrival moments. Pure CSS. |
-| [`installer-loading`](https://installer-ui.vercel.app/r/installer-loading.json) | Full-page wait state — a gradient comet endlessly traces the glyph. Self-contained. |
-| [`hero-scene`](https://installer-ui.vercel.app/r/hero-scene.json) | "Network behind the mark" landing hero with dispatch constellation and ticker. |
-| [`catenary-arcs`](https://installer-ui.vercel.app/r/catenary-arcs.json) | Nested catenary arches drawing themselves on, hairline strokes, brand gradient innermost. |
+| [`theme`](https://installer-ui.vercel.app/r/theme.json) | The full token sheet — brand + neutral variables (light & dark), type utilities, keyframes. |
+| **Inputs & controls** | |
+| [`select`](https://installer-ui.vercel.app/r/select.json) | Single-select on Base UI with a keyboard brand rail and CSS spring open/close. |
+| [`combobox`](https://installer-ui.vercel.app/r/combobox.json) | Searchable select — client or async filtering, clearable, skeleton rows. |
+| [`dropdown-menu`](https://installer-ui.vercel.app/r/dropdown-menu.json) | Actions menu with icons, shortcuts, checkbox/radio items, and submenus. |
+| [`calendar`](https://installer-ui.vercel.app/r/calendar.json) | react-day-picker restyled with ghost month/year selects and jump-to-today. |
+| [`date-picker`](https://installer-ui.vercel.app/r/date-picker.json) | Base UI popover over the calendar — field / pill / inline variants, presets. |
+| [`chips-input`](https://installer-ui.vercel.app/r/chips-input.json) | Tag input with spring chip enter/exit and de-dupe. |
+| [`segmented-control`](https://installer-ui.vercel.app/r/segmented-control.json) | ARIA radiogroup with a shared-layout sliding indicator. |
+| [`tabs`](https://installer-ui.vercel.app/r/tabs.json) | Sliding underline + crossfade panels, with counts and busy states. |
+| **Feedback & data** | |
+| [`toast`](https://installer-ui.vercel.app/r/toast.json) | Theme-syncing sonner Toaster + `toast()`. |
+| [`score-ring`](https://installer-ui.vercel.app/r/score-ring.json) | Circular 0–100 dial, four sizes, spring-filled, state-colored. |
+| [`segment-meter`](https://installer-ui.vercel.app/r/segment-meter.json) | Row of discrete cell meters with a four-ink grammar and assessing sweep. |
+| [`confidence-meter`](https://installer-ui.vercel.app/r/confidence-meter.json) | Dense five-segment 0–1 confidence meter with a tone-coded label. |
+| **Brand & motion** | |
+| [`installer-logomark`](https://installer-ui.vercel.app/r/installer-logomark.json) | One-shot draw-on + gradient-bloom logomark. Pure CSS. |
+| [`installer-loading`](https://installer-ui.vercel.app/r/installer-loading.json) | Full-page wait state — a comet endlessly traces the glyph. Self-contained. |
 | [`copilot-mark`](https://installer-ui.vercel.app/r/copilot-mark.json) | The logomark as a presence indicator — quiet when idle, self-tracing while live. |
-| [`spiced-band`](https://installer-ui.vercel.app/r/spiced-band.json) | Five discrete cell meters (0-3 per SPICED pillar) with gate ghosts and assessing sweep. |
-| [`spiced-ring`](https://installer-ui.vercel.app/r/spiced-ring.json) | Circular 0-100 score ring, four sizes, spring-animated, dashed when unknown. |
-| [`confidence-meter`](https://installer-ui.vercel.app/r/confidence-meter.json) | Dense 5-segment 0-1 confidence meter with tone-coded label and tooltip. |
+| [`catenary-arcs`](https://installer-ui.vercel.app/r/catenary-arcs.json) | Nested catenary arches drawing themselves on, brand gradient innermost. |
+| [`marquee`](https://installer-ui.vercel.app/r/marquee.json) | Seamless infinite scroll strip with edge fade and pause-on-hover. |
+| [`brand-button`](https://installer-ui.vercel.app/r/brand-button.json) | Gradient-border CTA that lifts and glows on hover. |
 | [`animated-number`](https://installer-ui.vercel.app/r/animated-number.json) | rAF-eased number transitions with an injected formatter. |
-| [`illustrations`](https://installer-ui.vercel.app/r/illustrations.json) | Six animated SVG scene illustrations plus a barrel export. |
 
 Registry index: [`/r/registry.json`](https://installer-ui.vercel.app/r/registry.json)
 
-### Option B: copy-paste
+### Copy-paste instead
 
-Grab the source from [`src/components/installer/`](src/components/installer/). Peer deps are minimal:
+Grab the source straight from [`src/components/installer/`](src/components/installer/). Peer deps by component:
 
-- **React 19** — everything
-- **motion** — `spiced-band`, `spiced-ring`, `confidence-meter`, `animated-number`, `illustrations`
-- **@base-ui-components/react** — the tooltip used by `spiced-band` and `confidence-meter`
-- **@phosphor-icons/react** — `hero-scene` (CTA arrow only)
-- **Tailwind v4** (+ `clsx`, `tailwind-merge` for `cn`) — the meter components and `hero-scene`; the logomark, loading, and copilot components are plain CSS
+- **React 19** — everything.
+- **motion** — the meters, `animated-number`, `chips-input`, `segmented-control`, `tabs`, `date-picker`.
+- **@base-ui/react** — `select`, `combobox`, `dropdown-menu`, `date-picker`, and the tooltip used by the meters / segmented control.
+- **react-day-picker** — `calendar`, `date-picker`.
+- **sonner** — `toast`.
+- **@phosphor-icons/react** — the inputs and calendar.
+- **Tailwind v4** (+ `clsx`, `tailwind-merge` for `cn`) — everything except the pure-CSS marks (`installer-logomark`, `installer-loading`, `marquee`, `brand-button`), which stand alone.
 
-### Required tokens
+## Theming — you own the styling
 
-Components that lean on the theme expect these variables (registry installs add them for you):
+The tokens are plain CSS variables. Installing the `theme` item (or any component that depends on it) writes them into your `globals.css` under `:root` and `.dark` — **you edit them there.** Change one line and every component follows:
 
 ```css
 :root {
-	--color-brand: #00CC33;
-	--color-brand-light: #7AFF04;
+	--color-brand: #00cc33; /* ← your brand color; the whole system re-tints */
+	--radius: 0.625rem;
+	/* …neutral palette: --background, --foreground, --border, --muted-foreground, … */
+}
+.dark {
+	--background: #111111;
+	/* …dark overrides… */
 }
 ```
 
-The meters also use standard shadcn tokens (`--border`, `--muted-foreground`, `--primary`). Full token sheet: [`src/styles.css`](src/styles.css).
+No fonts are required: the UI stack falls back to Geist → system-ui, and the display stack to Geist → Inter → system-ui. (The Interstaller display face on the showcase is an Installer brand asset and is **not** distributed.) See the full sheet at [`src/styles.css`](src/styles.css) or the [Theming page](https://installer-ui.vercel.app/theming).
 
 ## Usage
 
-### InstallerLoading — full-page wait state
+```tsx
+// A searchable select
+import { Combobox } from "@/components/installer/combobox";
+
+<Combobox
+	value={ownerId}
+	onValueChange={setOwnerId}
+	items={owners}
+	placeholder="Owner"
+	allowClear
+/>;
+```
 
 ```tsx
+// Full-page wait state (Next.js app/loading.tsx, or a Suspense fallback)
 import { InstallerLoading } from "@/components/installer/installer-loading";
 
-// React Router / Vite: as a suspense or route-pending fallback
-<Suspense fallback={<InstallerLoading message="Fetching your pipeline…" />}>
-	<App />
-</Suspense>
-
-// Next.js: app/loading.tsx
 export default function Loading() {
 	return <InstallerLoading kicker="Loading" />;
 }
-```
-
-### InstallerLogomark — one-shot intro
-
-```tsx
-import { InstallerLogomark } from "@/components/installer/installer-logomark";
-
-// Plays its draw-on once when mounted; static under prefers-reduced-motion
-<InstallerLogomark className="h-16 w-16" title="Installer" />
-
-// Static (no animation), e.g. in a header next to visible text
-<InstallerLogomark className="h-6 w-6" play={false} />
 ```
 
 ## Development

@@ -28,6 +28,18 @@
 			"recommended": true
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["**/src/components/installer/**"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useSemanticElements": "off"
+					}
+				}
+			}
+		}
+	],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"

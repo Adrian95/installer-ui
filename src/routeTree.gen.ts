@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThemingRouteImport } from './routes/theming'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsIndexRouteImport } from './routes/components.index'
 import { Route as DemoLoadingRouteImport } from './routes/demo.loading'
 import { Route as ComponentsSlugRouteImport } from './routes/components.$slug'
 
+const ThemingRoute = ThemingRouteImport.update({
+  id: '/theming',
+  path: '/theming',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const ComponentsSlugRoute = ComponentsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/theming': typeof ThemingRoute
   '/components/$slug': typeof ComponentsSlugRoute
   '/demo/loading': typeof DemoLoadingRoute
   '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/theming': typeof ThemingRoute
   '/components/$slug': typeof ComponentsSlugRoute
   '/demo/loading': typeof DemoLoadingRoute
   '/components': typeof ComponentsIndexRoute
@@ -50,20 +58,29 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/theming': typeof ThemingRoute
   '/components/$slug': typeof ComponentsSlugRoute
   '/demo/loading': typeof DemoLoadingRoute
   '/components/': typeof ComponentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/components/$slug' | '/demo/loading' | '/components/'
+  fullPaths:
+    '/' | '/theming' | '/components/$slug' | '/demo/loading' | '/components/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/components/$slug' | '/demo/loading' | '/components'
-  id: '__root__' | '/' | '/components/$slug' | '/demo/loading' | '/components/'
+  to: '/' | '/theming' | '/components/$slug' | '/demo/loading' | '/components'
+  id:
+    | '__root__'
+    | '/'
+    | '/theming'
+    | '/components/$slug'
+    | '/demo/loading'
+    | '/components/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ThemingRoute: typeof ThemingRoute
   ComponentsSlugRoute: typeof ComponentsSlugRoute
   DemoLoadingRoute: typeof DemoLoadingRoute
   ComponentsIndexRoute: typeof ComponentsIndexRoute
@@ -71,6 +88,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/theming': {
+      id: '/theming'
+      path: '/theming'
+      fullPath: '/theming'
+      preLoaderRoute: typeof ThemingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +128,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ThemingRoute: ThemingRoute,
   ComponentsSlugRoute: ComponentsSlugRoute,
   DemoLoadingRoute: DemoLoadingRoute,
   ComponentsIndexRoute: ComponentsIndexRoute,

@@ -1,0 +1,29 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "score-ring",
+	"type": "registry:component",
+	"title": "Score Ring",
+	"description": "A circular 0–100 indicator in four sizes that spring-fills on mount; state drives the stroke, and an unknown state renders a dashed ring.",
+	"dependencies": [
+		"motion",
+		"clsx",
+		"tailwind-merge"
+	],
+	"registryDependencies": [
+		"https://installer-ui.vercel.app/r/theme.json"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/score-ring.tsx",
+			"content": "/**\n * ScoreRing — a circular 0–100 indicator that spring-fills on mount.\n *\n * Four sizes (xs 20px → lg 80px) and four states driving the stroke:\n *   unknown → slate, dashed track, number suppressed (shows \"—\")\n *   low     → red\n *   medium  → amber\n *   high    → brand green\n *\n * When `state=\"unknown\"` the ring stays empty and hides the number so\n * it never reads as a real zero.\n */\nimport { motion, useMotionValue, useSpring, useTransform } from \"motion/react\";\nimport { useEffect, useRef } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport type ScoreRingSize = \"xs\" | \"sm\" | \"md\" | \"lg\";\nexport type ScoreRingState = \"unknown\" | \"low\" | \"medium\" | \"high\";\n\nexport interface ScoreRingProps {\n\t/** 0–100. Clamped and rounded for display. */\n\tscore: number;\n\tstate: ScoreRingState;\n\tsize?: ScoreRingSize;\n\tshowLabel?: boolean;\n\tclassName?: string;\n\t/** Overrides the computed aria-label. */\n\tlabel?: string;\n}\n\nconst SIZE_CONFIG: Record<\n\tScoreRingSize,\n\t{ outer: number; r: number; stroke: number; text: string }\n> = {\n\txs: { outer: 20, r: 8, stroke: 2.5, text: \"text-[9px] font-semibold\" },\n\tsm: { outer: 24, r: 10, stroke: 2.5, text: \"text-[10px] font-semibold\" },\n\tmd: { outer: 48, r: 21, stroke: 4, text: \"text-sm font-semibold\" },\n\tlg: { outer: 80, r: 35, stroke: 6, text: \"text-xl font-bold\" },\n};\n\nconst STATE_COLOR: Record<ScoreRingState, string> = {\n\tunknown: \"text-slate-400\",\n\tlow: \"text-red-500\",\n\tmedium: \"text-amber-500\",\n\thigh: \"text-[var(--color-brand)]\",\n};\n\nconst STATE_TRACK: Record<ScoreRingState, string> = {\n\tunknown: \"text-slate-200 dark:text-slate-800\",\n\tlow: \"text-red-500/15\",\n\tmedium: \"text-amber-500/15\",\n\thigh: \"text-[var(--color-brand)]/15\",\n};\n\nexport function ScoreRing({\n\tscore,\n\tstate,\n\tsize = \"sm\",\n\tshowLabel = true,\n\tclassName,\n\tlabel,\n}: ScoreRingProps) {\n\tconst config = SIZE_CONFIG[size];\n\tconst circumference = 2 * Math.PI * config.r;\n\tconst center = config.outer / 2;\n\tconst isUnknown = state === \"unknown\";\n\tconst displayScore = Math.max(0, Math.min(100, Math.round(score)));\n\n\tconst progress = useMotionValue(0);\n\tconst spring = useSpring(progress, { stiffness: 110, damping: 22 });\n\tconst strokeDashoffset = useTransform(\n\t\tspring,\n\t\t(v) => circumference - (v / 100) * circumference,\n\t);\n\n\tconst hasAnimated = useRef(false);\n\tuseEffect(() => {\n\t\tif (!hasAnimated.current) {\n\t\t\tprogress.set(0);\n\t\t\trequestAnimationFrame(() => progress.set(isUnknown ? 0 : displayScore));\n\t\t\thasAnimated.current = true;\n\t\t} else {\n\t\t\tprogress.set(isUnknown ? 0 : displayScore);\n\t\t}\n\t}, [displayScore, isUnknown, progress]);\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative inline-flex items-center justify-center\",\n\t\t\t\tclassName,\n\t\t\t)}\n\t\t\tstyle={{ width: config.outer, height: config.outer }}\n\t\t\trole=\"img\"\n\t\t\taria-label={\n\t\t\t\tlabel ??\n\t\t\t\t(isUnknown ? \"Score not yet assessed\" : `Score ${displayScore} of 100`)\n\t\t\t}\n\t\t>\n\t\t\t<svg\n\t\t\t\twidth={config.outer}\n\t\t\t\theight={config.outer}\n\t\t\t\tclassName=\"-rotate-90\"\n\t\t\t\taria-hidden=\"true\"\n\t\t\t>\n\t\t\t\t<circle\n\t\t\t\t\tcx={center}\n\t\t\t\t\tcy={center}\n\t\t\t\t\tr={config.r}\n\t\t\t\t\tfill=\"none\"\n\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\tstrokeWidth={config.stroke}\n\t\t\t\t\tstrokeDasharray={isUnknown ? \"2 3\" : undefined}\n\t\t\t\t\tclassName={STATE_TRACK[state]}\n\t\t\t\t/>\n\t\t\t\t{!isUnknown && (\n\t\t\t\t\t<motion.circle\n\t\t\t\t\t\tcx={center}\n\t\t\t\t\t\tcy={center}\n\t\t\t\t\t\tr={config.r}\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\tstrokeWidth={config.stroke}\n\t\t\t\t\t\tstrokeDasharray={circumference}\n\t\t\t\t\t\tstyle={{ strokeDashoffset }}\n\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\tclassName={STATE_COLOR[state]}\n\t\t\t\t\t/>\n\t\t\t\t)}\n\t\t\t</svg>\n\t\t\t{showLabel && (\n\t\t\t\t<span\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"absolute leading-none\",\n\t\t\t\t\t\tconfig.text,\n\t\t\t\t\t\tisUnknown ? \"text-slate-400\" : STATE_COLOR[state],\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t{isUnknown ? \"—\" : displayScore}\n\t\t\t\t</span>\n\t\t\t)}\n\t\t</div>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/score-ring.tsx"
+		},
+		{
+			"path": "src/lib/utils.ts",
+			"content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\nexport function cn(...inputs: ClassValue[]) {\n\treturn twMerge(clsx(inputs));\n}\n",
+			"type": "registry:lib",
+			"target": "lib/utils.ts"
+		}
+	]
+}
