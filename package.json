@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
-    "build": "vite build",
+    "registry:build": "bun scripts/build-registry.ts",
+    "build": "bun run registry:build && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "format": "biome format",

@@ -1,0 +1,18 @@
+{
+	"$schema": "https://ui.shadcn.com/schema/registry-item.json",
+	"name": "animated-number",
+	"type": "registry:component",
+	"title": "Animated Number",
+	"description": "Tasteful numeric ease for figures that change — rAF-driven easeOutQuad with an injected formatter; snaps under prefers-reduced-motion.",
+	"dependencies": [
+		"motion"
+	],
+	"files": [
+		{
+			"path": "src/components/installer/animated-number.tsx",
+			"content": "/**\n * AnimatedNumber\n *\n * Tasteful numeric ease for any figure that changes in response to\n * a remote sync or local edit — currency, scores, coverage\n * percentages, or anything else the caller formats. Provides the\n * \"the number actually moved\" feedback.\n *\n * Why an effect: the rAF clock is an external system and the frame\n * callback is the only legitimate side-effect — Dan Abramov's\n * \"effects sync to the outside world\" carve-out. `useReducedMotion`\n * snaps instead of eases.\n *\n * The formatter is injected so one component renders currency, plain\n * integers, percentages, or anything else the caller produces.\n */\n\nimport { useReducedMotion } from \"motion/react\";\nimport { useEffect, useRef, useState } from \"react\";\n\nconst DURATION_MS = 240;\nconst EASE = (t: number) => 1 - (1 - t) * (1 - t); // easeOutQuad\n\nexport interface AnimatedNumberProps {\n\t/** Target numeric value to interpolate toward. */\n\tvalue: number;\n\t/** Pure formatter — must be referentially stable. */\n\tformat: (value: number) => string;\n\tclassName?: string;\n}\n\nexport function AnimatedNumber({\n\tvalue,\n\tformat,\n\tclassName,\n}: AnimatedNumberProps) {\n\tconst reduce = useReducedMotion();\n\tconst [display, setDisplay] = useState(value);\n\tconst fromRef = useRef(value);\n\tconst rafRef = useRef<number | null>(null);\n\n\tuseEffect(() => {\n\t\tif (reduce) {\n\t\t\tfromRef.current = value;\n\t\t\tsetDisplay(value);\n\t\t\treturn;\n\t\t}\n\t\tconst start = performance.now();\n\t\tconst from = fromRef.current;\n\t\tconst to = value;\n\t\tif (from === to) return;\n\n\t\tconst tick = (now: number) => {\n\t\t\tconst t = Math.min(1, (now - start) / DURATION_MS);\n\t\t\tconst next = from + (to - from) * EASE(t);\n\t\t\tsetDisplay(next);\n\t\t\tif (t < 1) {\n\t\t\t\trafRef.current = requestAnimationFrame(tick);\n\t\t\t} else {\n\t\t\t\tfromRef.current = to;\n\t\t\t\trafRef.current = null;\n\t\t\t}\n\t\t};\n\n\t\trafRef.current = requestAnimationFrame(tick);\n\t\treturn () => {\n\t\t\tif (rafRef.current !== null) {\n\t\t\t\tcancelAnimationFrame(rafRef.current);\n\t\t\t\trafRef.current = null;\n\t\t\t\tfromRef.current = value;\n\t\t\t}\n\t\t};\n\t}, [value, reduce]);\n\n\treturn (\n\t\t<span className={className} aria-live=\"polite\">\n\t\t\t{format(display)}\n\t\t</span>\n\t);\n}\n",
+			"type": "registry:component",
+			"target": "components/installer/animated-number.tsx"
+		}
+	]
+}

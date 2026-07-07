@@ -1,204 +1,95 @@
-Welcome to your new TanStack Start app! 
+# Installer UI
 
-# Getting Started
+Animated brand components, score meters, and hero scenes from Installer's internal tools — install them via the shadcn registry or copy-paste the source.
 
-To run this application:
+Live showcase: **[installer-ui.vercel.app](https://installer-ui.vercel.app)**
+
+## Quick start
+
+### Option A: shadcn registry
+
+```bash
+npx shadcn@latest add https://installer-ui.vercel.app/r/installer-loading.json
+```
+
+| Item | Description |
+| --- | --- |
+| [`installer-logomark`](https://installer-ui.vercel.app/r/installer-logomark.json) | One-shot draw-on + gradient-bloom logomark for arrival moments. Pure CSS. |
+| [`installer-loading`](https://installer-ui.vercel.app/r/installer-loading.json) | Full-page wait state — a gradient comet endlessly traces the glyph. Self-contained. |
+| [`hero-scene`](https://installer-ui.vercel.app/r/hero-scene.json) | "Network behind the mark" landing hero with dispatch constellation and ticker. |
+| [`catenary-arcs`](https://installer-ui.vercel.app/r/catenary-arcs.json) | Nested catenary arches drawing themselves on, hairline strokes, brand gradient innermost. |
+| [`copilot-mark`](https://installer-ui.vercel.app/r/copilot-mark.json) | The logomark as a presence indicator — quiet when idle, self-tracing while live. |
+| [`spiced-band`](https://installer-ui.vercel.app/r/spiced-band.json) | Five discrete cell meters (0-3 per SPICED pillar) with gate ghosts and assessing sweep. |
+| [`spiced-ring`](https://installer-ui.vercel.app/r/spiced-ring.json) | Circular 0-100 score ring, four sizes, spring-animated, dashed when unknown. |
+| [`confidence-meter`](https://installer-ui.vercel.app/r/confidence-meter.json) | Dense 5-segment 0-1 confidence meter with tone-coded label and tooltip. |
+| [`animated-number`](https://installer-ui.vercel.app/r/animated-number.json) | rAF-eased number transitions with an injected formatter. |
+| [`illustrations`](https://installer-ui.vercel.app/r/illustrations.json) | Six animated SVG scene illustrations plus a barrel export. |
+
+Registry index: [`/r/registry.json`](https://installer-ui.vercel.app/r/registry.json)
+
+### Option B: copy-paste
+
+Grab the source from [`src/components/installer/`](src/components/installer/). Peer deps are minimal:
+
+- **React 19** — everything
+- **motion** — `spiced-band`, `spiced-ring`, `confidence-meter`, `animated-number`, `illustrations`
+- **@base-ui-components/react** — the tooltip used by `spiced-band` and `confidence-meter`
+- **@phosphor-icons/react** — `hero-scene` (CTA arrow only)
+- **Tailwind v4** (+ `clsx`, `tailwind-merge` for `cn`) — the meter components and `hero-scene`; the logomark, loading, and copilot components are plain CSS
+
+### Required tokens
+
+Components that lean on the theme expect these variables (registry installs add them for you):
+
+```css
+:root {
+	--color-brand: #00CC33;
+	--color-brand-light: #7AFF04;
+}
+```
+
+The meters also use standard shadcn tokens (`--border`, `--muted-foreground`, `--primary`). Full token sheet: [`src/styles.css`](src/styles.css).
+
+## Usage
+
+### InstallerLoading — full-page wait state
+
+```tsx
+import { InstallerLoading } from "@/components/installer/installer-loading";
+
+// React Router / Vite: as a suspense or route-pending fallback
+<Suspense fallback={<InstallerLoading message="Fetching your pipeline…" />}>
+	<App />
+</Suspense>
+
+// Next.js: app/loading.tsx
+export default function Loading() {
+	return <InstallerLoading kicker="Loading" />;
+}
+```
+
+### InstallerLogomark — one-shot intro
+
+```tsx
+import { InstallerLogomark } from "@/components/installer/installer-logomark";
+
+// Plays its draw-on once when mounted; static under prefers-reduced-motion
+<InstallerLogomark className="h-16 w-16" title="Installer" />
+
+// Static (no animation), e.g. in a header next to visible text
+<InstallerLogomark className="h-6 w-6" play={false} />
+```
+
+## Development
 
 ```bash
 bun install
-bun --bun run dev
+bun run dev      # dev server on :3000
+bun run build    # registry:build + vite build
 ```
 
-# Building For Production
+`bun run registry:build` regenerates `public/r/*.json` from the component source; the Vercel build runs it automatically. PRs get preview deployments via Vercel.
 
-To build this application for production:
+## License
 
-```bash
-bun --bun run build
-```
-
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-bun --bun run test
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `bun install @tailwindcss/vite tailwindcss -D`
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
-
-```bash
-bun --bun run lint
-bun --bun run format
-bun --bun run check
-```
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Code is [MIT](LICENSE). The Installer name, logomark, and Interstaller font are brand assets of Installer — see the trademark notice in [LICENSE](LICENSE).
