@@ -42,9 +42,7 @@ export function InstallerLoading({
 	return (
 		<div
 			className={
-				className
-					? `installer-loading ${className}`
-					: "installer-loading"
+				className ? `installer-loading ${className}` : "installer-loading"
 			}
 		>
 			<style>{INSTALLER_LOADING_CSS}</style>

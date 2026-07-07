@@ -31,12 +31,14 @@ function TooltipTrigger({
 	if (asChild) {
 		return (
 			<TooltipPrimitive.Trigger
-				render={children as React.ReactElement}
+				render={children as React.ReactElement<Record<string, unknown>>}
 				{...props}
 			/>
 		);
 	}
-	return <TooltipPrimitive.Trigger {...props}>{children}</TooltipPrimitive.Trigger>;
+	return (
+		<TooltipPrimitive.Trigger {...props}>{children}</TooltipPrimitive.Trigger>
+	);
 }
 
 function TooltipContent({
@@ -53,7 +55,11 @@ function TooltipContent({
 }) {
 	return (
 		<TooltipPrimitive.Portal>
-			<TooltipPrimitive.Positioner side={side} sideOffset={sideOffset} align={align}>
+			<TooltipPrimitive.Positioner
+				side={side}
+				sideOffset={sideOffset}
+				align={align}
+			>
 				<TooltipPrimitive.Popup
 					className={cn(
 						"z-50 max-w-xs rounded-md bg-foreground px-3 py-1.5 text-xs text-background shadow-md",
